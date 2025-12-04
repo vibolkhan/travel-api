@@ -1,8 +1,10 @@
 const { Destination } = require('../models');
 const { v4: uuid } = require('uuid');
+const { listWithPagination } = require('./pagination');
 
-function listDestinations() {
-  return Destination.findAll();
+function listDestinations(options = {}) {
+  // options can include: page, limit, where (e.g. { province, category })
+  return listWithPagination(Destination, options);
 }
 
 function getDestination(id) {

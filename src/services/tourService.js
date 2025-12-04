@@ -1,8 +1,10 @@
 const { Tour } = require('../models');
 const { v4: uuid } = require('uuid');
+const { listWithPagination } = require('./pagination');
 
-function listTours() {
-  return Tour.findAll();
+function listTours(options = {}) {
+  // options can include: page, limit, where (e.g. { province, providerId })
+  return listWithPagination(Tour, options);
 }
 
 function getTour(id) {

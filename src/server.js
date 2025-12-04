@@ -1,8 +1,10 @@
 require('dotenv').config();
 const app = require('./app');
 const { sequelize } = require('./models');
+const setupSwagger = require('./swagger');
 
 const PORT = process.env.PORT || 4000;
+setupSwagger(app);
 
 async function start() {
   try {

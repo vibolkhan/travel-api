@@ -1,8 +1,10 @@
 const { Favorite } = require('../models');
 const { v4: uuid } = require('uuid');
+const { listWithPagination } = require('./pagination');
 
-function listFavorites() {
-  return Favorite.findAll();
+function listFavorites(options = {}) {
+  // options can include: page, limit, where (e.g. { userId })
+  return listWithPagination(Favorite, options);
 }
 
 function getFavorite(id) {

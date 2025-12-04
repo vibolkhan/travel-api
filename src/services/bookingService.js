@@ -1,8 +1,10 @@
 const { Booking } = require('../models');
 const { v4: uuid } = require('uuid');
+const { listWithPagination } = require('./pagination');
 
-function listBookings() {
-  return Booking.findAll();
+function listBookings(options = {}) {
+  // options can include: page, limit, where (e.g. { userId, status })
+  return listWithPagination(Booking, options);
 }
 
 function getBooking(id) {

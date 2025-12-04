@@ -1,8 +1,10 @@
 const { Review } = require('../models');
 const { v4: uuid } = require('uuid');
+const { listWithPagination } = require('./pagination');
 
-function listReviews() {
-  return Review.findAll();
+function listReviews(options = {}) {
+  // options can include: page, limit, where (e.g. { userId, tourId, attractionId })
+  return listWithPagination(Review, options);
 }
 
 function getReview(id) {

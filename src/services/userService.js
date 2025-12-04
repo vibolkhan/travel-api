@@ -1,6 +1,7 @@
 const { User } = require('../models');
 const { v4: uuid } = require('uuid');
 const bcrypt = require('bcryptjs');
+const { listWithPagination } = require('./pagination');
 
 async function createUser(payload) {
   const id = payload.id || uuid();
@@ -18,8 +19,12 @@ async function createUser(payload) {
   });
 }
 
-function getUsers() {
-  return User.findAll({ attributes: { exclude: ['password'] } });
+function getUsers(options = {}) {
+  // options can include: page, limit, where (e.g. { role })
+  return listWithPagination(User, {
+    ...options,
+    attributes: { exclude: ['password'] }
+  });
 }
 
 function getUserById(id) {

@@ -1,8 +1,10 @@
 const { Hotel } = require('../models');
 const { v4: uuid } = require('uuid');
+const { listWithPagination } = require('./pagination');
 
-function listHotels() {
-  return Hotel.findAll();
+function listHotels(options = {}) {
+  // options can include: page, limit, where (e.g. { province })
+  return listWithPagination(Hotel, options);
 }
 
 function getHotel(id) {

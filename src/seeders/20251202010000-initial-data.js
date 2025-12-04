@@ -13,7 +13,7 @@ module.exports = {
     const providerId = randomUUID();
 
     const hotelId = randomUUID();
-    const attractionId = randomUUID();
+    const destinationId = randomUUID();
     const tourId = randomUUID();
 
     const bookingId = randomUUID();
@@ -93,12 +93,12 @@ module.exports = {
       {}
     );
 
-    // 3) ATTRACTIONS
+    // 3) DESTINATIONS
     await queryInterface.bulkInsert(
-      'attractions',
+      'destinations',
       [
         {
-          id: attractionId,
+          id: destinationId,
           nameEn: 'Rubber Plantation Viewpoint',
           nameKh: 'ចំណុចមើលទេសភាពចំការកៅស៊ូ',
           descriptionEn: 'Beautiful scenery.',
@@ -106,7 +106,7 @@ module.exports = {
           province: 'Tbong Khmum',
           district: 'Memot',
           location: JSON.stringify({ lat: 11.8623, lng: 105.8512 }),
-          images: JSON.stringify(['https://example.com/attractions/1.jpg']),
+          images: JSON.stringify(['https://example.com/destinations/1.jpg']),
           ticketPrice: 2.5,
           openingHours: '08:00-17:00',
           category: 'Nature',
@@ -185,7 +185,7 @@ module.exports = {
         {
           id: reviewId,
           userId: userId,
-          attractionId: attractionId,
+          destinationId: destinationId,
           tourId: tourId,
           rating: 5,
           comment: 'Very good!',
@@ -204,7 +204,7 @@ module.exports = {
         {
           id: favorite1Id,
           userId: userId,
-          attractionId: attractionId,
+          destinationId: destinationId,
           tourId: null,
           createdAt: now,
           updatedAt: now
@@ -212,7 +212,7 @@ module.exports = {
         {
           id: favorite2Id,
           userId: userId,
-          attractionId: null,
+          destinationId: null,
           tourId: tourId,
           createdAt: now,
           updatedAt: now
@@ -228,7 +228,7 @@ module.exports = {
     await queryInterface.bulkDelete('reviews', null, {});
     await queryInterface.bulkDelete('bookings', null, {});
     await queryInterface.bulkDelete('tours', null, {});
-    await queryInterface.bulkDelete('attractions', null, {});
+    await queryInterface.bulkDelete('destinations', null, {});
     await queryInterface.bulkDelete('hotels', null, {});
     await queryInterface.bulkDelete('users', null, {});
   }

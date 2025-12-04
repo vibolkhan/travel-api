@@ -3,7 +3,7 @@ const sequelize = require('../config/database');
 
 const User = require('./user')(sequelize, DataTypes);
 const Hotel = require('./hotel')(sequelize, DataTypes);
-const Attraction = require('./attraction')(sequelize, DataTypes);
+const Destination = require('./destinations')(sequelize, DataTypes);
 const Tour = require('./tour')(sequelize, DataTypes);
 const Booking = require('./booking')(sequelize, DataTypes);
 const Review = require('./review')(sequelize, DataTypes);
@@ -22,11 +22,11 @@ Favorite.belongsTo(User, { foreignKey: 'userId' });
 Hotel.hasMany(Booking, { foreignKey: 'hotelId' });
 Booking.belongsTo(Hotel, { foreignKey: 'hotelId' });
 
-Attraction.hasMany(Review, { foreignKey: 'attractionId' });
-Review.belongsTo(Attraction, { foreignKey: 'attractionId' });
+Destination.hasMany(Review, { foreignKey: 'destinationId' });
+Review.belongsTo(Destination, { foreignKey: 'destinationId' });
 
-Attraction.hasMany(Favorite, { foreignKey: 'attractionId' });
-Favorite.belongsTo(Attraction, { foreignKey: 'attractionId' });
+Destination.hasMany(Favorite, { foreignKey: 'destinationId' });
+Favorite.belongsTo(Destination, { foreignKey: 'destinationId' });
 
 Tour.hasMany(Booking, { foreignKey: 'tourId' });
 Booking.belongsTo(Tour, { foreignKey: 'tourId' });
@@ -44,7 +44,7 @@ module.exports = {
   sequelize,
   User,
   Hotel,
-  Attraction,
+  Destination,
   Tour,
   Booking,
   Review,

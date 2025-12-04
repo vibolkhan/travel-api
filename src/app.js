@@ -7,7 +7,7 @@ app.use(express.json());
 app.use('/auth', require('./routes/authRoutes'));
 app.use('/users', require('./routes/userRoutes'));
 app.use('/hotels', require('./routes/hotelRoutes'));
-app.use('/attractions', require('./routes/attractionRoutes'));
+app.use('/destinations', require('./routes/destinationRoutes'));
 app.use('/tours', require('./routes/tourRoutes'));
 app.use('/bookings', require('./routes/bookingRoutes'));
 app.use('/reviews', require('./routes/reviewRoutes'));

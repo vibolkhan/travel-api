@@ -52,7 +52,7 @@ module.exports = {
       }
     });
 
-    await queryInterface.createTable('attractions', {
+    await queryInterface.createTable('destinations', {
       id: { type: STRING, primaryKey: true },
       nameEn: STRING,
       nameKh: STRING,
@@ -164,10 +164,10 @@ module.exports = {
         allowNull: false,
         references: { model: 'users', key: 'id' }
       },
-      attractionId: {
+      destinationId: {
         type: STRING,
         allowNull: true,
-        references: { model: 'attractions', key: 'id' }
+        references: { model: 'destinations', key: 'id' }
       },
       tourId: {
         type: STRING,
@@ -196,10 +196,10 @@ module.exports = {
         allowNull: false,
         references: { model: 'users', key: 'id' }
       },
-      attractionId: {
+      destinationId: {
         type: STRING,
         allowNull: true,
-        references: { model: 'attractions', key: 'id' }
+        references: { model: 'destinations', key: 'id' }
       },
       tourId: {
         type: STRING,
@@ -224,7 +224,7 @@ module.exports = {
     await queryInterface.dropTable('reviews');
     await queryInterface.dropTable('bookings');
     await queryInterface.dropTable('tours');
-    await queryInterface.dropTable('attractions');
+    await queryInterface.dropTable('destinations');
     await queryInterface.dropTable('hotels');
     await queryInterface.dropTable('users');
   }

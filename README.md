@@ -49,7 +49,7 @@ Node.js REST API using Express + MariaDB + Sequelize.
 - CRUD:
   - `/users`
   - `/hotels`
-  - `/attractions`
+  - `/destinations`
   - `/tours`
   - `/bookings`
   - `/reviews`

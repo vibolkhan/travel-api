@@ -8,7 +8,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false
     },
-    attractionId: {
+    destinationId: {
       type: DataTypes.STRING,
       allowNull: true
     },

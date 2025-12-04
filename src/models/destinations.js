@@ -1,5 +1,5 @@
 module.exports = (sequelize, DataTypes) => {
-  const Attraction = sequelize.define('Attraction', {
+  const Destination = sequelize.define('Destination', {
     id: {
       type: DataTypes.STRING,
       primaryKey: true
@@ -32,9 +32,9 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: 0
     }
   }, {
-    tableName: 'attractions',
+    tableName: 'destinations',
     timestamps: true
   });
 
-  return Attraction;
+  return Destination;
 };

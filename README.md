@@ -24,25 +24,19 @@ Node.js REST API using Express + MariaDB + Sequelize.
    JWT_EXPIRES_IN=7d
    ```
 
-3. Create database in MariaDB:
-
-   ```sql
-   CREATE DATABASE travel_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-   ```
-
-4. Run migrations:
+3. Run migrations:
 
    ```bash
    npx sequelize-cli db:migrate
    ```
 
-5. Run Seed:
+4. Run Seed:
 
    ```bash
    npx sequelize-cli db:seed
    ```
 
-6. Start dev server:
+5. Start dev server:
 
    ```bash
    npm run dev

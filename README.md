@@ -36,7 +36,13 @@ Node.js REST API using Express + MariaDB + Sequelize.
    npx sequelize-cli db:migrate
    ```
 
-5. Start dev server:
+5. Run Seed:
+
+   ```bash
+   npx sequelize-cli db:seed
+   ```
+
+6. Start dev server:
 
    ```bash
    npm run dev

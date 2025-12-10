@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const service = require('../services/hotelService');
 const { authRequired } = require('../middleware/authMiddleware');
+const { upload, getFileUrl } = require('../middleware/upload');
 
 /**
  * @openapi
@@ -69,7 +70,7 @@ router.get('/:id', async (req, res) => {
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             required:
@@ -86,43 +87,9 @@ router.get('/:id', async (req, res) => {
  *               address:
  *                 type: string
  *                 example: "Memot Town, Tbong Khmum"
- *               location:
- *                 type: object
- *                 description: Lat/Lng JSON object
- *                 properties:
- *                   lat:
- *                     type: number
- *                     example: 11.8605
- *                   lng:
- *                     type: number
- *                     example: 105.8483
- *               images:
- *                 type: array
- *                 items:
- *                   type: string
- *                   example: "https://example.com/hotels/hotel-1.jpg"
  *               starRating:
  *                 type: integer
- *                 minimum: 1
- *                 maximum: 5
  *                 example: 4
- *               priceRange:
- *                 type: object
- *                 properties:
- *                   min:
- *                     type: number
- *                     example: 25
- *                   max:
- *                     type: number
- *                     example: 80
- *                   currency:
- *                     type: string
- *                     example: "USD"
- *               amenities:
- *                 type: array
- *                 items:
- *                   type: string
- *                   example: "Free WiFi"
  *               phone:
  *                 type: string
  *                 example: "+85512340001"
@@ -133,17 +100,35 @@ router.get('/:id', async (req, res) => {
  *                 type: string
  *                 example: "https://memotriverside.example.com"
  *               approved:
- *                 type: boolean
- *                 example: true
+ *                 type: string
+ *                 description: "true or false"
+ *                 example: "true"
+ *               location:
+ *                 type: string
+ *                 description: 'JSON string like {"lat":11.86,"lng":105.84}'
+ *                 example: "{\"lat\":11.8605,\"lng\":105.8483}"
+ *               priceRange:
+ *                 type: string
+ *                 description: 'JSON string like {"min":25,"max":80,"currency":"USD"}'
+ *                 example: "{\"min\":25,\"max\":80,\"currency\":\"USD\"}"
+ *               amenities:
+ *                 type: string
+ *                 description: 'JSON string array like ["Free WiFi","Parking"]'
+ *                 example: "[\"Free WiFi\",\"Parking\",\"Breakfast\"]"
+ *               image:
+ *                 type: string
+ *                 format: binary
+ *                 description: Hotel image file
  *     responses:
  *       201:
  *         description: Hotel created
  *       400:
- *         description: Validation error
+ *         description: Unable to create hotel
  */
-router.post('/', authRequired, async (req, res) => {
+router.post('/', authRequired, upload.single('image'), async (req, res) => {
   try {
-    const item = await service.createHotel(req.body);
+    const images = req.file ? getFileUrl(req, req.file) : null;
+    const item = await service.createHotel({ ...req.body, images });
     res.status(201).json(item);
   } catch (err) {
     res.status(400).json({ message: 'Unable to create hotel', error: err.message });
@@ -185,10 +170,10 @@ router.post('/', authRequired, async (req, res) => {
  *                     type: number
  *                   lng:
  *                     type: number
- *               images:
- *                 type: array
- *                 items:
- *                   type: string
+ *               image:
+ *                 type: string
+ *                 format: binary
+ *                 description: Hotel image file
  *               starRating:
  *                 type: integer
  *               priceRange:
@@ -222,7 +207,8 @@ router.post('/', authRequired, async (req, res) => {
  */
 router.put('/:id', authRequired, async (req, res) => {
   try {
-    const item = await service.updateHotel(req.params.id, req.body);
+    const images = req.file ? getFileUrl(req, req.file) : null;
+    const item = await service.updateHotel(req.params.id, { ...req.body, images });
     if (!item) return res.status(404).json({ message: 'Hotel not found' });
     res.json(item);
   } catch (err) {

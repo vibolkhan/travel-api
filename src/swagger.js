@@ -13,11 +13,26 @@ const options = {
     },
     servers: [
       {
-        url: process.env.API_BASE_URL || 'http://localhost:4000/api/v1'
+        // Keep base URL without /api/v1, since your paths already start with /api/v1/...
+        url: process.env.API_BASE_URL || 'http://localhost:4000'
+      }
+    ],
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT'
+        }
+      }
+    },
+    // 🔐 Apply bearerAuth to ALL endpoints by default
+    security: [
+      {
+        bearerAuth: []
       }
     ]
   },
-  // 👇 IMPORTANT: point to src/routes/*.js
   apis: [path.join(__dirname, 'routes', '*.js')]
 };
 

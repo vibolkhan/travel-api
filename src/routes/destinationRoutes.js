@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const service = require('../services/destinationService');
 const { authRequired } = require('../middleware/authMiddleware');
+const { upload, getFileUrl } = require('../middleware/upload');
 
 /**
  * @openapi
@@ -67,7 +68,7 @@ router.get('/:id', async (req, res) => {
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             required:
@@ -91,16 +92,12 @@ router.get('/:id', async (req, res) => {
  *                 type: string
  *                 example: "Memot"
  *               location:
- *                 type: object
- *                 properties:
- *                   lat:
- *                     type: number
- *                   lng:
- *                     type: number
- *               images:
- *                 type: array
- *                 items:
- *                   type: string
+ *                 type: string
+ *                 description: 'JSON object string: {"lat": 11.1, "lng": 105.2}'
+ *               image:
+ *                 type: string
+ *                 format: binary
+ *                 description: Destination image file
  *               ticketPrice:
  *                 type: number
  *                 example: 2.5
@@ -125,9 +122,10 @@ router.get('/:id', async (req, res) => {
  *       400:
  *         description: Validation error
  */
-router.post('/', authRequired, async (req, res) => {
+router.post('/', authRequired, upload.single('image'), async (req, res) => {
   try {
-    const item = await service.createDestination(req.body);
+    const images = req.file ? getFileUrl(req, req.file) : null;
+    const item = await service.createDestination({ ...req.body, images });
     res.status(201).json(item);
   } catch (err) {
     res.status(400).json({ message: 'Unable to create destination', error: err.message });
@@ -152,7 +150,7 @@ router.post('/', authRequired, async (req, res) => {
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             properties:
@@ -169,16 +167,12 @@ router.post('/', authRequired, async (req, res) => {
  *               district:
  *                 type: string
  *               location:
- *                 type: object
- *                 properties:
- *                   lat:
- *                     type: number
- *                   lng:
- *                     type: number
- *               images:
- *                 type: array
- *                 items:
- *                   type: string
+ *                 type: string
+ *                 description: 'JSON object string'
+ *               image:
+ *                 type: string
+ *                 format: binary
+ *                 description: Destination image file
  *               ticketPrice:
  *                 type: number
  *               openingHours:
@@ -201,9 +195,10 @@ router.post('/', authRequired, async (req, res) => {
  *       404:
  *         description: Destination not found
  */
-router.put('/:id', authRequired, async (req, res) => {
+router.put('/:id', authRequired, upload.single('image'), async (req, res) => {
   try {
-    const item = await service.updateDestination(req.params.id, req.body);
+    const images = req.file ? getFileUrl(req, req.file) : null;
+    const item = await service.updateDestination(req.params.id, { ...req.body, images: [images] });
     if (!item) return res.status(404).json({ message: 'Destination not found' });
     res.json(item);
   } catch (err) {

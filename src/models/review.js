@@ -16,12 +16,25 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: true
     },
-    rating: DataTypes.INTEGER,
+    rating: {
+      type: DataTypes.INTEGER,
+      validate: {
+        min: 1,
+        max: 5
+      }
+    },
     comment: DataTypes.STRING,
     images: DataTypes.JSON
   }, {
     tableName: 'reviews',
-    timestamps: true
+    timestamps: true,
+    validate: {
+      eitherDestinationOrTour() {
+        if (!this.destinationId && !this.tourId) {
+          throw new Error('Review must belong to a destination or tour.');
+        }
+      }
+    }
   });
 
   return Review;

@@ -9,6 +9,7 @@ module.exports = {
 
     // Generate UUIDs once and reuse them for relationships
     const adminId = randomUUID();
+    const admin2Id = randomUUID();
     const userId = randomUUID();
     const providerId = randomUUID();
 
@@ -22,6 +23,7 @@ module.exports = {
     const favorite2Id = randomUUID();
 
     const adminPasswordHash = await bcrypt.hash('123', 10);
+    const admin2PasswordHash = await bcrypt.hash('admin!@#$...,,,123', 10);
     const userPasswordHash = await bcrypt.hash('user123', 10);
     const providerPasswordHash = await bcrypt.hash('provider123', 10);
 
@@ -32,6 +34,19 @@ module.exports = {
         email: 'admin@example.com',
         phone: null,
         password: adminPasswordHash,
+        fullName: 'System Administrator',
+        avatar: null,
+        role: 'admin',
+        language: 'en',
+        verified: true,
+        createdAt: now,
+        updatedAt: now
+      },
+      {
+        id: admin2Id,
+        email: 'admin2@example.com',
+        phone: null,
+        password: admin2PasswordHash,
         fullName: 'System Administrator',
         avatar: null,
         role: 'admin',

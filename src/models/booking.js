@@ -16,13 +16,25 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: true
     },
-    checkIn: DataTypes.DATEONLY,
-    checkOut: DataTypes.DATEONLY,
+    roomId: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    checkIn: DataTypes.DATE,
+    checkOut: DataTypes.DATE,
     guests: DataTypes.INTEGER,
     totalPrice: DataTypes.FLOAT,
     status: {
-      type: DataTypes.ENUM('pending', 'confirmed', 'cancelled', 'completed'),
-      defaultValue: 'pending'
+      type: DataTypes.ENUM('pending', 'cancelled', 'completed'),
+      defaultValue: 'pending',
+      get() {
+        const rawValue = this.getDataValue('status');
+        const checkOut = this.getDataValue('checkOut');
+        if (rawValue !== 'cancelled' && checkOut && new Date(checkOut) < new Date()) {
+          return 'completed';
+        }
+        return rawValue;
+      }
     },
     paymentStatus: {
       type: DataTypes.STRING,

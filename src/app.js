@@ -20,6 +20,7 @@ app.use(`${API_PREFIX}/tours`, require('./routes/tourRoutes'));
 app.use(`${API_PREFIX}/bookings`, require('./routes/bookingRoutes'));
 app.use(`${API_PREFIX}/reviews`, require('./routes/reviewRoutes'));
 app.use(`${API_PREFIX}/favorites`, require('./routes/favoriteRoutes'));
+app.use(`${API_PREFIX}/rooms`, require('./routes/roomRoutes'));
 
 app.get('/', (req, res) => {
   res.json({ status: 'ok', message: 'Travel API' });

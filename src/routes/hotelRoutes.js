@@ -241,4 +241,37 @@ router.delete('/:id', authRequired, async (req, res) => {
   res.status(204).send();
 });
 
+/**
+ * @openapi
+ * /api/v1/hotels/{id}/rooms:
+ *   get:
+ *     summary: Get all rooms for a specific hotel
+ *     tags:
+ *       - Hotels
+ *       - Rooms
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: isAvailable
+ *         schema:
+ *           type: boolean
+ *         description: Filter by availability
+ *     responses:
+ *       200:
+ *         description: List of rooms for the hotel
+ */
+router.get('/:id/rooms', async (req, res) => {
+  const roomService = require('../services/roomService');
+  const { isAvailable } = req.query;
+  const where = {};
+  if (isAvailable !== undefined) where.isAvailable = isAvailable === 'true';
+
+  const items = await roomService.getRoomsByHotel(req.params.id, { ...req.query, where });
+  res.json(items);
+});
+
 module.exports = router;

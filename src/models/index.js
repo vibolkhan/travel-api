@@ -8,6 +8,7 @@ const Tour = require('./tour')(sequelize, DataTypes);
 const Booking = require('./booking')(sequelize, DataTypes);
 const Review = require('./review')(sequelize, DataTypes);
 const Favorite = require('./favorite')(sequelize, DataTypes);
+const Room = require('./room')(sequelize, DataTypes);
 
 // Associations
 User.hasMany(Booking, { foreignKey: 'userId' });
@@ -21,6 +22,12 @@ Favorite.belongsTo(User, { foreignKey: 'userId' });
 
 Hotel.hasMany(Booking, { foreignKey: 'hotelId' });
 Booking.belongsTo(Hotel, { foreignKey: 'hotelId' });
+
+Hotel.hasMany(Room, { foreignKey: 'hotelId' });
+Room.belongsTo(Hotel, { foreignKey: 'hotelId' });
+
+Room.hasMany(Booking, { foreignKey: 'roomId' });
+Booking.belongsTo(Room, { foreignKey: 'roomId' });
 
 Destination.hasMany(Review, { foreignKey: 'destinationId' });
 Review.belongsTo(Destination, { foreignKey: 'destinationId' });
@@ -48,5 +55,6 @@ module.exports = {
   Tour,
   Booking,
   Review,
-  Favorite
+  Favorite,
+  Room
 };

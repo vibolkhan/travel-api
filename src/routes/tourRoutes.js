@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const service = require('../services/tourService');
 const { authRequired } = require('../middleware/authMiddleware');
+const { upload, getFileUrl } = require('../middleware/upload');
 
 /**
  * @openapi
@@ -67,7 +68,7 @@ router.get('/:id', async (req, res) => {
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             required:
@@ -81,64 +82,47 @@ router.get('/:id', async (req, res) => {
  *                 example: "Memot Rubber Plantation Day Tour"
  *               titleKh:
  *                 type: string
- *                 example: "ការធ្វើដំណើរថ្ងៃតែមើលចំការកៅស៊ូ Memot"
  *               descriptionEn:
  *                 type: string
  *               descriptionKh:
  *                 type: string
  *               duration:
  *                 type: string
- *                 example: "1 day"
  *               price:
  *                 type: number
- *                 example: 45
  *               itinerary:
- *                 type: array
- *                 description: List of steps in the tour
- *                 items:
- *                   type: object
- *                   properties:
- *                     time:
- *                       type: string
- *                       example: "08:00"
- *                     activity:
- *                       type: string
- *                       example: "Pick-up from hotel"
- *               images:
- *                 type: array
- *                 items:
- *                   type: string
+ *                 type: string
+ *                 description: 'JSON array string like [{"time":"08:00","activity":"..."}]'
+ *               image:
+ *                 type: string
+ *                 format: binary
+ *                 description: Tour image file
  *               included:
- *                 type: array
- *                 items:
- *                   type: string
+ *                 type: string
+ *                 description: 'JSON array string like ["Lunch", "Guide"]'
  *               excluded:
- *                 type: array
- *                 items:
- *                   type: string
+ *                 type: string
+ *                 description: 'JSON array string like ["Tips"]'
  *               maxPeople:
  *                 type: integer
- *                 example: 10
  *               province:
  *                 type: string
- *                 example: "Tbong Khmum"
  *               providerId:
  *                 type: string
- *                 description: User ID of provider
+ *               destinationId:
+ *                 type: string
  *               approved:
  *                 type: boolean
- *               rating:
- *                 type: number
- *                 format: float
  *     responses:
  *       201:
  *         description: Tour created
  *       400:
  *         description: Validation error
  */
-router.post('/', authRequired, async (req, res) => {
+router.post('/', authRequired, upload.single('image'), async (req, res) => {
   try {
-    const item = await service.createTour(req.body);
+    const images = req.file ? getFileUrl(req, req.file) : null;
+    const item = await service.createTour({ ...req.body, images });
     res.status(201).json(item);
   } catch (err) {
     res.status(400).json({ message: 'Unable to create tour', error: err.message });
@@ -163,7 +147,7 @@ router.post('/', authRequired, async (req, res) => {
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             properties:
@@ -180,31 +164,24 @@ router.post('/', authRequired, async (req, res) => {
  *               price:
  *                 type: number
  *               itinerary:
- *                 type: array
- *                 items:
- *                   type: object
- *               images:
- *                 type: array
- *                 items:
- *                   type: string
+ *                 type: string
+ *               image:
+ *                 type: string
+ *                 format: binary
  *               included:
- *                 type: array
- *                 items:
- *                   type: string
+ *                 type: string
  *               excluded:
- *                 type: array
- *                 items:
- *                   type: string
+ *                 type: string
  *               maxPeople:
  *                 type: integer
  *               province:
  *                 type: string
  *               providerId:
  *                 type: string
+ *               destinationId:
+ *                 type: string
  *               approved:
  *                 type: boolean
- *               rating:
- *                 type: number
  *     responses:
  *       200:
  *         description: Tour updated
@@ -213,9 +190,10 @@ router.post('/', authRequired, async (req, res) => {
  *       404:
  *         description: Tour not found
  */
-router.put('/:id', authRequired, async (req, res) => {
+router.put('/:id', authRequired, upload.single('image'), async (req, res) => {
   try {
-    const item = await service.updateTour(req.params.id, req.body);
+    const images = req.file ? getFileUrl(req, req.file) : null;
+    const item = await service.updateTour(req.params.id, { ...req.body, images });
     if (!item) return res.status(404).json({ message: 'Tour not found' });
     res.json(item);
   } catch (err) {

@@ -115,6 +115,9 @@ router.get('/:id', async (req, res) => {
  *                 type: string
  *                 description: 'JSON string array like ["Free WiFi","Parking"]'
  *                 example: "[\"Free WiFi\",\"Parking\",\"Breakfast\"]"
+ *               destinationId:
+ *                 type: string
+ *                 description: "ID of the associated destination"
  *               image:
  *                 type: string
  *                 format: binary
@@ -194,6 +197,8 @@ router.post('/', authRequired, upload.single('image'), async (req, res) => {
  *               email:
  *                 type: string
  *               website:
+ *                 type: string
+ *               destinationId:
  *                 type: string
  *               approved:
  *                 type: boolean

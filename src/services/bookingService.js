@@ -12,7 +12,21 @@ function getBooking(id) {
 }
 
 function createBooking(data) {
-  return Booking.create({ id: data.id || uuid(), ...data });
+  // Convert empty strings to null for optional foreign keys
+  const sanitizedData = { ...data };
+
+  // Handle field name variations (e.g., numGuests instead of guests)
+  if (data.numGuests && !data.guests) {
+    sanitizedData.guests = Number(data.numGuests);
+  }
+
+  ['tourId', 'hotelId', 'roomId'].forEach(field => {
+    if (sanitizedData[field] === '') {
+      sanitizedData[field] = null;
+    }
+  });
+
+  return Booking.create({ id: sanitizedData.id || uuid(), ...sanitizedData });
 }
 
 async function updateBooking(id, data) {

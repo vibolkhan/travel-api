@@ -131,7 +131,9 @@ router.get('/:id', async (req, res) => {
  */
 router.post('/', authRequired, async (req, res) => {
   try {
-    const item = await service.createBooking(req.body);
+    // Ensure userId comes from the authenticated user if not provided or to enforce ownership
+    const bookingData = { ...req.body, userId: req.user.id };
+    const item = await service.createBooking(bookingData);
     res.status(201).json(item);
   } catch (err) {
     res.status(400).json({ message: 'Unable to create booking', error: err.message });

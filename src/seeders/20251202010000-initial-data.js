@@ -6,245 +6,140 @@ const bcrypt = require('bcryptjs');
 module.exports = {
   async up(queryInterface) {
     const now = new Date();
-
-    // Generate UUIDs once and reuse them for relationships
-    const adminId = randomUUID();
-    const admin2Id = randomUUID();
-    const userId = randomUUID();
-    const providerId = randomUUID();
-
-    const hotelId = randomUUID();
-    const destinationId = randomUUID();
-    const tourId = randomUUID();
-
-    const bookingId = randomUUID();
-    const reviewId = randomUUID();
-    const favorite1Id = randomUUID();
-    const favorite2Id = randomUUID();
-
-    const adminPasswordHash = await bcrypt.hash('123', 10);
-    const admin2PasswordHash = await bcrypt.hash('admin!@#$...,,,123', 10);
-    const userPasswordHash = await bcrypt.hash('user123', 10);
-    const providerPasswordHash = await bcrypt.hash('provider123', 10);
+    const passwordHash = await bcrypt.hash('123', 10);
 
     // 1) USERS
-    await queryInterface.bulkInsert('users', [
+    const users = [
+      { id: randomUUID(), email: 'admin@example.com', password: passwordHash, fullName: 'System Admin', role: 'admin', verified: true, createdAt: now, updatedAt: now },
+      { id: randomUUID(), email: 'provider@example.com', password: passwordHash, fullName: 'Tour Provider', role: 'provider', verified: true, createdAt: now, updatedAt: now },
+      { id: randomUUID(), email: 'user@example.com', password: passwordHash, fullName: 'Demo User', role: 'user', verified: true, createdAt: now, updatedAt: now }
+    ];
+    await queryInterface.bulkInsert('users', users);
+
+    const providerId = users[1].id;
+    const userId = users[2].id;
+
+    // 2) DATA GENERATION
+    const destinationData = [
+      { nameEn: 'Angkor Wat', nameKh: 'អង្គរវត្ត', province: 'Siem Reap', category: 'Historical' },
+      { nameEn: 'Koh Rong', nameKh: 'កោះរ៉ុង', province: 'Sihanoukville', category: 'Nature' },
+      { nameEn: 'Royal Palace', nameKh: 'ព្រះបរមរាជវាំង', province: 'Phnom Penh', category: 'Culture' },
+      { nameEn: 'Bokor Mountain', nameKh: 'ភ្នំបូកគោ', province: 'Kampot', category: 'Nature' },
+      { nameEn: 'Bousra Waterfall', nameKh: 'ទឹកជ្រោះប៊ូស្រា', province: 'Mondulkiri', category: 'Nature' },
+      { nameEn: 'Bamboo Train', nameKh: 'ឡូរី', province: 'Battambang', category: 'Activity' },
+      { nameEn: 'Crab Market', nameKh: 'ផ្សារក្តាម', province: 'Kep', category: 'Food' },
+      { nameEn: 'Preah Vihear Temple', nameKh: 'ប្រាសាទព្រះវិហារ', province: 'Preah Vihear', category: 'Historical' }
+    ];
+
+    const destinations = [];
+    const hotels = [];
+    const rooms = [];
+    const tours = [];
+
+    for (const data of destinationData) {
+      const destId = randomUUID();
+      destinations.push({
+        id: destId,
+        ...data,
+        ticketPrice: Math.floor(Math.random() * 40),
+        rating: (4 + Math.random()).toFixed(1),
+        approved: true,
+        createdAt: now,
+        updatedAt: now
+      });
+
+      // Random Hotels (1 to 5)
+      const numHotels = Math.floor(Math.random() * 5) + 1;
+      for (let h = 1; h <= numHotels; h++) {
+        const hotelId = randomUUID();
+        hotels.push({
+          id: hotelId,
+          name: `${data.nameEn} ${['Resort', 'Hotel', 'Inn', 'Villas', 'Lodge'][h % 5]}`,
+          province: data.province,
+          starRating: Math.floor(Math.random() * 3) + 3,
+          destinationId: destId,
+          approved: true,
+          createdAt: now,
+          updatedAt: now
+        });
+
+        // Random Rooms (1 to 10)
+        const numRooms = Math.floor(Math.random() * 10) + 1;
+        for (let r = 1; r <= numRooms; r++) {
+          rooms.push({
+            id: randomUUID(),
+            hotelId: hotelId,
+            roomNumber: `${h}0${r}`,
+            roomType: ['Standard', 'Deluxe', 'Suite', 'King'][r % 4],
+            capacity: Math.floor(Math.random() * 2) + 2,
+            pricePerNight: Math.floor(Math.random() * 200) + 50,
+            isAvailable: true,
+            createdAt: now,
+            updatedAt: now
+          });
+        }
+      }
+
+      // Random Tours (1 to 5)
+      const numTours = Math.floor(Math.random() * 5) + 1;
+      for (let t = 1; t <= numTours; t++) {
+        tours.push({
+          id: randomUUID(),
+          titleEn: `${data.nameEn} ${['Discovery', 'Full Day', 'Adventure', 'Private', 'Sunset'][t % 5]} Tour`,
+          price: Math.floor(Math.random() * 100) + 10,
+          province: data.province,
+          providerId: providerId,
+          destinationId: destId,
+          approved: true,
+          createdAt: now,
+          updatedAt: now
+        });
+      }
+    }
+
+    await queryInterface.bulkInsert('destinations', destinations);
+    await queryInterface.bulkInsert('hotels', hotels);
+    await queryInterface.bulkInsert('rooms', rooms);
+    await queryInterface.bulkInsert('tours', tours);
+
+    // 3) BOOKINGS (Sample set)
+    const pastDate = new Date();
+    pastDate.setDate(pastDate.getDate() - 5);
+
+    const bookings = [
       {
-        id: adminId,
-        email: 'admin@example.com',
-        phone: null,
-        password: adminPasswordHash,
-        fullName: 'System Administrator',
-        avatar: null,
-        role: 'admin',
-        language: 'en',
-        verified: true,
+        id: randomUUID(),
+        userId: userId,
+        tourId: tours[0].id,
+        checkIn: pastDate,
+        checkOut: pastDate,
+        status: 'pending', // Will show as completed via model
+        totalPrice: tours[0].price,
         createdAt: now,
         updatedAt: now
       },
       {
-        id: admin2Id,
-        email: 'admin2@example.com',
-        phone: null,
-        password: admin2PasswordHash,
-        fullName: 'System Administrator',
-        avatar: null,
-        role: 'admin',
-        language: 'en',
-        verified: true,
-        createdAt: now,
-        updatedAt: now
-      },
-      {
-        id: userId,
-        email: 'user@example.com',
-        phone: '+85512345678',
-        password: userPasswordHash,
-        fullName: 'Demo User',
-        avatar: null,
-        role: 'user',
-        language: 'en',
-        verified: true,
-        createdAt: now,
-        updatedAt: now
-      },
-      {
-        id: providerId,
-        email: 'provider@example.com',
-        phone: '+85587654321',
-        password: providerPasswordHash,
-        fullName: 'Demo Provider',
-        avatar: null,
-        role: 'provider',
-        language: 'en',
-        verified: true,
+        id: randomUUID(),
+        userId: userId,
+        hotelId: hotels[0].id,
+        roomId: rooms[0].id,
+        checkIn: now,
+        checkOut: new Date(now.getTime() + 86400000),
+        status: 'pending',
+        totalPrice: rooms[0].pricePerNight,
         createdAt: now,
         updatedAt: now
       }
-    ]);
-
-    // 2) HOTELS
-    await queryInterface.bulkInsert(
-      'hotels',
-      [
-        {
-          id: hotelId,
-          name: 'Memot Riverside Hotel',
-          province: 'Tbong Khmum',
-          address: 'Memot Town, Tbong Khmum',
-          location: JSON.stringify({ lat: 11.8605, lng: 105.8483 }),
-          images: JSON.stringify(['https://example.com/hotels/hotel-1-1.jpg']),
-          starRating: 4,
-          priceRange: JSON.stringify({ min: 25, max: 80, currency: 'USD' }),
-          amenities: JSON.stringify(['Free WiFi', 'Parking']),
-          phone: '+85512340001',
-          email: 'info@memotriverside.com',
-          website: null,
-          approved: true,
-          createdAt: now,
-          updatedAt: now
-        }
-      ],
-      {}
-    );
-
-    // 3) DESTINATIONS
-    await queryInterface.bulkInsert(
-      'destinations',
-      [
-        {
-          id: destinationId,
-          nameEn: 'Rubber Plantation Viewpoint',
-          nameKh: 'ចំណុចមើលទេសភាពចំការកៅស៊ូ',
-          descriptionEn: 'Beautiful scenery.',
-          descriptionKh: 'ទេសភាពល្អបំផុត។',
-          province: 'Tbong Khmum',
-          district: 'Memot',
-          location: JSON.stringify({ lat: 11.8623, lng: 105.8512 }),
-          images: JSON.stringify(['https://example.com/destinations/1.jpg']),
-          ticketPrice: 2.5,
-          openingHours: '08:00-17:00',
-          category: 'Nature',
-          featured: true,
-          approved: true,
-          views: 30,
-          rating: 4.5,
-          createdAt: now,
-          updatedAt: now
-        }
-      ],
-      {}
-    );
-
-    // 4) TOURS
-    await queryInterface.bulkInsert(
-      'tours',
-      [
-        {
-          id: tourId,
-          titleEn: 'Rubber Plantation Day Tour',
-          titleKh: 'ការធ្វើដំណើរថ្ងៃតែមើលចំការកៅស៊ូ',
-          descriptionEn: 'Explore Memot rubber plantations.',
-          descriptionKh: 'ស្វែងយល់ពីចំការកៅស៊ូ។',
-          duration: '1 day',
-          price: 45,
-          itinerary: JSON.stringify([
-            { time: '08:00', activity: 'Pick-up' },
-            { time: '10:00', activity: 'Visit rubber farm' }
-          ]),
-          images: JSON.stringify(['https://example.com/tours/1.jpg']),
-          included: JSON.stringify(['Transport', 'Guide']),
-          excluded: JSON.stringify(['Personal expenses']),
-          maxPeople: 10,
-          province: 'Tbong Khmum',
-          providerId: providerId, // FK to provider user
-          approved: true,
-          rating: 4.7,
-          createdAt: now,
-          updatedAt: now
-        }
-      ],
-      {}
-    );
-
-    // 5) BOOKINGS
-    await queryInterface.bulkInsert(
-      'bookings',
-      [
-        {
-          id: bookingId,
-          userId: userId,
-          tourId: tourId,
-          hotelId: hotelId,
-          checkIn: '2025-12-10',
-          checkOut: '2025-12-11',
-          guests: 2,
-          totalPrice: 90,
-          status: 'confirmed',
-          paymentStatus: 'paid',
-          paymentMethod: 'card',
-          paymentTranId: 'TXN001',
-          bakongTransactionId: null,
-          refundedAmount: 0,
-          createdAt: now,
-          updatedAt: now
-        }
-      ],
-      {}
-    );
-
-    // 6) REVIEWS
-    await queryInterface.bulkInsert(
-      'reviews',
-      [
-        {
-          id: reviewId,
-          userId: userId,
-          destinationId: destinationId,
-          tourId: tourId,
-          rating: 5,
-          comment: 'Very good!',
-          images: JSON.stringify(['https://example.com/reviews/1.jpg']),
-          createdAt: now,
-          updatedAt: now
-        }
-      ],
-      {}
-    );
-
-    // 7) FAVORITES
-    await queryInterface.bulkInsert(
-      'favorites',
-      [
-        {
-          id: favorite1Id,
-          userId: userId,
-          destinationId: destinationId,
-          tourId: null,
-          createdAt: now,
-          updatedAt: now
-        },
-        {
-          id: favorite2Id,
-          userId: userId,
-          destinationId: null,
-          tourId: tourId,
-          createdAt: now,
-          updatedAt: now
-        }
-      ],
-      {}
-    );
+    ];
+    await queryInterface.bulkInsert('bookings', bookings);
   },
 
   async down(queryInterface) {
-    // simplest: wipe all rows from these tables
-    await queryInterface.bulkDelete('favorites', null, {});
-    await queryInterface.bulkDelete('reviews', null, {});
     await queryInterface.bulkDelete('bookings', null, {});
+    await queryInterface.bulkDelete('rooms', null, {});
     await queryInterface.bulkDelete('tours', null, {});
-    await queryInterface.bulkDelete('destinations', null, {});
     await queryInterface.bulkDelete('hotels', null, {});
+    await queryInterface.bulkDelete('destinations', null, {});
     await queryInterface.bulkDelete('users', null, {});
   }
 };

@@ -231,4 +231,52 @@ router.delete('/:id', authRequired, async (req, res) => {
   res.status(204).send();
 });
 
+/**
+ * @openapi
+ * /api/v1/destinations/{id}/hotels:
+ *   get:
+ *     summary: Get all hotels for a specific destination
+ *     tags:
+ *       - Destinations
+ *       - Hotels
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: List of hotels for the destination
+ */
+router.get('/:id/hotels', async (req, res) => {
+  const hotelService = require('../services/hotelService');
+  const items = await hotelService.getHotelsByDestination(req.params.id, req.query);
+  res.json(items);
+});
+
+/**
+ * @openapi
+ * /api/v1/destinations/{id}/tours:
+ *   get:
+ *     summary: Get all tours for a specific destination
+ *     tags:
+ *       - Destinations
+ *       - Tours
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: List of tours for the destination
+ */
+router.get('/:id/tours', async (req, res) => {
+  const tourService = require('../services/tourService');
+  const items = await tourService.getToursByDestination(req.params.id, req.query);
+  res.json(items);
+});
+
 module.exports = router;

@@ -27,6 +27,10 @@ module.exports = (sequelize, DataTypes) => {
     rating: {
       type: DataTypes.FLOAT,
       defaultValue: 0
+    },
+    destinationId: {
+      type: DataTypes.STRING,
+      allowNull: true
     }
   }, {
     tableName: 'tours',

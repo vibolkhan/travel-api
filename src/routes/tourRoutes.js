@@ -26,7 +26,7 @@ const { authRequired } = require('../middleware/authMiddleware');
  *         description: Paginated list of tours
  */
 router.get('/', async (req, res) => {
-  const items = await service.listTours();
+  const items = await service.listTours(req.query);
   res.json(items);
 });
 

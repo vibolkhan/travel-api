@@ -47,6 +47,12 @@ Favorite.belongsTo(Tour, { foreignKey: 'tourId' });
 User.hasMany(Tour, { foreignKey: 'providerId', as: 'tours' });
 Tour.belongsTo(User, { foreignKey: 'providerId', as: 'provider' });
 
+Destination.hasMany(Hotel, { foreignKey: 'destinationId' });
+Hotel.belongsTo(Destination, { foreignKey: 'destinationId' });
+
+Destination.hasMany(Tour, { foreignKey: 'destinationId' });
+Tour.belongsTo(Destination, { foreignKey: 'destinationId' });
+
 module.exports = {
   sequelize,
   User,

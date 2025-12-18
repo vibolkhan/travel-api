@@ -18,6 +18,10 @@ module.exports = (sequelize, DataTypes) => {
     approved: {
       type: DataTypes.BOOLEAN,
       defaultValue: false
+    },
+    destinationId: {
+      type: DataTypes.STRING,
+      allowNull: true
     }
   }, {
     tableName: 'hotels',

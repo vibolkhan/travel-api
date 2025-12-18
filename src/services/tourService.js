@@ -11,6 +11,11 @@ function getTour(id) {
   return Tour.findByPk(id);
 }
 
+function getToursByDestination(destinationId, options = {}) {
+  const where = { ...options.where, destinationId };
+  return listWithPagination(Tour, { ...options, where });
+}
+
 function createTour(data) {
   return Tour.create({ id: data.id || uuid(), ...data });
 }
@@ -32,6 +37,7 @@ async function deleteTour(id) {
 module.exports = {
   listTours,
   getTour,
+  getToursByDestination,
   createTour,
   updateTour,
   deleteTour

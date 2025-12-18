@@ -11,6 +11,11 @@ function getHotel(id) {
   return Hotel.findByPk(id);
 }
 
+function getHotelsByDestination(destinationId, options = {}) {
+  const where = { ...options.where, destinationId };
+  return listWithPagination(Hotel, { ...options, where });
+}
+
 function createHotel(data) {
   return Hotel.create({ id: data.id || uuid(), ...data });
 }
@@ -32,6 +37,7 @@ async function deleteHotel(id) {
 module.exports = {
   listHotels,
   getHotel,
+  getHotelsByDestination,
   createHotel,
   updateHotel,
   deleteHotel

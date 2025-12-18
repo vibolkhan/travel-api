@@ -94,6 +94,31 @@ router.get('/', authRequired, async (req, res) => {
 
 /**
  * @openapi
+ * /api/v1/users/me/profile:
+ *   get:
+ *     summary: Get current authenticated user profile
+ *     tags:
+ *       - Users
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Current user profile
+ *       401:
+ *         description: Unauthorized
+ */
+router.get('/me/profile', authRequired, async (req, res) => {
+  try {
+    const user = await userService.getUserById(req.user.id);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to fetch profile' });
+  }
+});
+
+/**
+ * @openapi
  * /api/v1/users/{id}:
  *   get:
  *     summary: Get a user by ID

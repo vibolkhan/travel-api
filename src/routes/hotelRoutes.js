@@ -29,7 +29,7 @@ const { upload, getFileUrl } = require('../middleware/upload');
  *         description: Paginated list of hotels
  */
 router.get('/', async (req, res) => {
-  const items = await service.listHotels();
+  const items = await service.listHotels(req.query);
   res.json(items);
 });
 
